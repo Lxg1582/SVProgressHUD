@@ -261,22 +261,15 @@ static const CGFloat SVProgressHUDUndefinedProgress = -1;
             SVProgressHUDBackgroundColor = [UIColor colorWithWhite:0.0f alpha:0.8f];
             SVProgressHUDForegroundColor = [UIColor whiteColor];
         }
-
-        NSBundle* bundle = [NSBundle bundleForClass:self.class];
-        UIImage* infoImage = [UIImage imageNamed:@"SVProgressHUD.bundle/info" inBundle:bundle compatibleWithTraitCollection:nil];
-        UIImage* successImage = [UIImage imageNamed:@"SVProgressHUD.bundle/success" inBundle:bundle compatibleWithTraitCollection:nil];
-        UIImage* errorImage = [UIImage imageNamed:@"SVProgressHUD.bundle/error" inBundle:bundle compatibleWithTraitCollection:nil];
-
         if ([[UIImage class] instancesRespondToSelector:@selector(imageWithRenderingMode:)]) {
-            SVProgressHUDInfoImage = [infoImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-            SVProgressHUDSuccessImage = [successImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-            SVProgressHUDErrorImage = [errorImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            SVProgressHUDInfoImage = [[UIImage imageNamed:@"SVProgressHUD.bundle/info"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            SVProgressHUDSuccessImage = [[UIImage imageNamed:@"SVProgressHUD.bundle/success"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            SVProgressHUDErrorImage = [[UIImage imageNamed:@"SVProgressHUD.bundle/error"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         } else {
-            SVProgressHUDInfoImage = infoImage;
-            SVProgressHUDSuccessImage = successImage;
-            SVProgressHUDErrorImage = errorImage;
+            SVProgressHUDInfoImage = [UIImage imageNamed:@"SVProgressHUD.bundle/info"];
+            SVProgressHUDSuccessImage = [UIImage imageNamed:@"SVProgressHUD.bundle/success"];
+            SVProgressHUDErrorImage = [UIImage imageNamed:@"SVProgressHUD.bundle/error"];
         }
-
         SVProgressHUDRingThickness = 2;
         SVProgressHUDDefaultMaskType = SVProgressHUDMaskTypeNone;
     }
@@ -701,11 +694,10 @@ static const CGFloat SVProgressHUDUndefinedProgress = -1;
 
 - (void)showImage:(UIImage *)image status:(NSString *)string duration:(NSTimeInterval)duration maskType:(SVProgressHUDMaskType)hudMaskType {
     self.progress = SVProgressHUDUndefinedProgress;
-    self.maskType = hudMaskType;
     [self cancelRingLayerAnimation];
     
     if(![self.class isVisible])
-        [self.class showWithMaskType:self.maskType];
+        [self.class show];
   
     if ([self.imageView respondsToSelector:@selector(setTintColor:)]) {
         self.imageView.tintColor = SVProgressHUDForegroundColor;
@@ -714,17 +706,16 @@ static const CGFloat SVProgressHUDUndefinedProgress = -1;
     }
     self.imageView.image = image;
     self.imageView.hidden = NO;
-    
+    self.maskType = hudMaskType;
+  
     self.stringLabel.text = string;
     [self updatePosition];
     [self.indefiniteAnimatedView removeFromSuperview];
     
     if(self.maskType != SVProgressHUDMaskTypeNone) {
-        self.overlayView.userInteractionEnabled = YES;
         self.accessibilityLabel = string;
         self.isAccessibilityElement = YES;
     } else {
-        self.overlayView.userInteractionEnabled = NO;
         self.hudView.accessibilityLabel = string;
         self.hudView.isAccessibilityElement = YES;
     }
